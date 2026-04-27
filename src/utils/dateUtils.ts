@@ -1,4 +1,4 @@
-import { startOfWeek, endOfWeek, addDays, subDays } from 'date-fns';
+import { startOfWeek, endOfWeek, addDays } from 'date-fns';
 
 export const getBiWeeklyPeriod = (date: Date) => {
   const day = date.getDay(); // 0 is Sunday, 1 is Monday... 6 is Saturday

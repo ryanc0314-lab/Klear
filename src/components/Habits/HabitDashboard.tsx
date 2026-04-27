@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useHabitStore } from '../../store/habitStore';
 import { Plus, Check, Flame, Trash2, Undo, Circle, CheckCircle2, ChevronDown, ChevronUp, Archive, Calendar, Pencil, X } from 'lucide-react';
 import { ResponsiveLine } from '@nivo/line';
-import { format, subDays, startOfWeek, addDays, subWeeks, isToday, differenceInDays } from 'date-fns';
+import { format, subDays, addDays, isToday, differenceInDays } from 'date-fns';
 import { type Habit, type HabitLog } from '../../db/database';
 import { HabitTagEditor, type HabitTag } from './HabitTagEditor';
 import { WeeklyGoalsArea } from '../Shared/WeeklyGoalsArea';
