@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from 'react';
 import { useHabitStore } from '../../store/habitStore';
 import { Target } from 'lucide-react';
-import { startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
+import { isWithinInterval } from 'date-fns';
+import { getBiWeeklyPeriod } from '../../utils/dateUtils';
 
 export const WeeklyHabitGoals = () => {
   const { habits, logs, loadHabits } = useHabitStore();
@@ -15,13 +16,12 @@ export const WeeklyHabitGoals = () => {
     if (activeHabitsWithGoals.length === 0) return [];
 
     const now = new Date();
-    const weekStart = startOfWeek(now, { weekStartsOn: 1 });
-    const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+    const { periodStart, periodEnd } = getBiWeeklyPeriod(now);
 
     return activeHabitsWithGoals.map(habit => {
       const habitLogs = logs.filter(l => 
         l.habit_id === habit.id && 
-        isWithinInterval(new Date(l.date + 'T12:00:00'), { start: weekStart, end: weekEnd })
+        isWithinInterval(new Date(l.date + 'T12:00:00'), { start: periodStart, end: periodEnd })
       );
 
       let currentProgress = 0;
@@ -49,10 +49,10 @@ export const WeeklyHabitGoals = () => {
       <div className="animated-card" style={{ padding: '1.5rem', marginBottom: '2rem', borderLeft: '4px solid var(--border-color)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
           <Target size={24} color="var(--text-muted)" />
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Active Weekly Goals</h2>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Active Phase Goals</h2>
         </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-          No weekly goals set yet. Go to the Habits tab and edit a habit to set a weekly target!
+          No phase goals set yet. Go to the Habits tab and edit a habit to set a phase target!
         </p>
       </div>
     );
@@ -62,7 +62,7 @@ export const WeeklyHabitGoals = () => {
     <div className="animated-card" style={{ padding: '1.5rem', marginBottom: '2rem', borderLeft: '4px solid var(--accent-primary)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem', color: 'var(--text-primary)' }}>
         <Target size={24} color="var(--accent-primary)" />
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Active Weekly Goals</h2>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Active Phase Goals</h2>
       </div>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>

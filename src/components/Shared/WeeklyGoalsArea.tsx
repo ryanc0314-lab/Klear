@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useWeeklyGoalStore } from '../../store/weeklyGoalStore';
 import { Target, Save, Check } from 'lucide-react';
-import { format, startOfWeek, endOfWeek } from 'date-fns';
+import { format } from 'date-fns';
+import { getBiWeeklyPeriod } from '../../utils/dateUtils';
 
 export const WeeklyGoalsArea = ({ currentDate = new Date() }: { currentDate?: Date }) => {
   const { currentGoal, loadGoal, saveGoal } = useWeeklyGoalStore();
@@ -10,15 +11,18 @@ export const WeeklyGoalsArea = ({ currentDate = new Date() }: { currentDate?: Da
   const [showSaved, setShowSaved] = useState(false);
   const timeoutRef = useRef<number | undefined>(undefined);
 
-  const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
-  const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
+  const { periodStart, periodEnd } = getBiWeeklyPeriod(currentDate);
 
-  const weekStartStr = format(weekStart, 'yyyy-MM-dd');
+  const weekStartStr = format(periodStart, 'yyyy-MM-dd');
   const seededWeekRef = useRef<string | null>(null);
 
+  // Use a stable date string for dependencies to prevent infinite render loops
+  // if currentDate is a new Date() object on every render
+  const dateStr = format(currentDate, 'yyyy-MM-dd');
+
   useEffect(() => {
-    loadGoal(currentDate);
-  }, [currentDate, loadGoal]);
+    loadGoal(new Date(dateStr + 'T12:00:00'));
+  }, [dateStr, loadGoal]);
 
   useEffect(() => {
     if (seededWeekRef.current !== weekStartStr) {
@@ -53,9 +57,9 @@ export const WeeklyGoalsArea = ({ currentDate = new Date() }: { currentDate?: Da
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-primary)' }}>
           <Target size={24} color="var(--accent-primary)" />
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Weekly Intentions</h2>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Phase Intentions</h2>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
-              {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
+              {format(periodStart, 'MMM d')} - {format(periodEnd, 'MMM d, yyyy')}
             </div>
           </div>
         </div>
@@ -78,7 +82,7 @@ export const WeeklyGoalsArea = ({ currentDate = new Date() }: { currentDate?: Da
         value={text}
         onChange={(e) => setText(e.target.value)}
         onBlur={handleBlur}
-        placeholder="Write out your goals, intentions, or focuses for this week here..."
+        placeholder="Write out your goals, intentions, or focuses for this phase here..."
         rows={5}
         style={{
           width: '100%',

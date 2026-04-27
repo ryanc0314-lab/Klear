@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useWeeklyGoalStore } from '../../store/weeklyGoalStore';
 import { Target, ChevronDown, ChevronUp } from 'lucide-react';
-import { format, parseISO, startOfWeek, endOfWeek } from 'date-fns';
+import { format, parseISO } from 'date-fns';
+import { getBiWeeklyPeriod } from '../../utils/dateUtils';
 
 export const PastWeeklyGoals = () => {
   const { allGoals, loadAllGoals } = useWeeklyGoalStore();
@@ -13,10 +14,10 @@ export const PastWeeklyGoals = () => {
     }
   }, [isOpen, loadAllGoals]);
 
-  // Filter out the current week if needed, but since it asks for "previous weeks", 
-  // it might be nice to just show anything that is not the current week's goal
-  const currentWeekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
-  const pastGoals = allGoals.filter(goal => goal.week_start !== currentWeekStart && goal.text.trim().length > 0);
+  // Filter out the current phase if needed
+  const { periodStart: currentPeriodStart } = getBiWeeklyPeriod(new Date());
+  const currentPhaseStartStr = format(currentPeriodStart, 'yyyy-MM-dd');
+  const pastGoals = allGoals.filter(goal => goal.week_start !== currentPhaseStartStr && goal.text.trim().length > 0);
 
   return (
     <div style={{ marginBottom: '2rem' }}>
@@ -39,7 +40,7 @@ export const PastWeeklyGoals = () => {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <Target size={20} color="var(--accent-secondary)" />
-          <span>Past Weekly Intentions</span>
+          <span>Past Phase Intentions</span>
         </div>
         {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
       </button>
@@ -52,16 +53,16 @@ export const PastWeeklyGoals = () => {
             </div>
           ) : (
             pastGoals.map(goal => {
-              const weekStartDate = parseISO(goal.week_start);
-              const weekEndDate = endOfWeek(weekStartDate, { weekStartsOn: 1 });
+              const phaseStartDate = parseISO(goal.week_start);
+              const { periodEnd: phaseEndDate } = getBiWeeklyPeriod(phaseStartDate);
               
               return (
                 <div key={goal.id} className="animated-card" style={{ padding: '1.5rem', borderLeft: '4px solid var(--accent-secondary)' }}>
                   <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '0.25rem' }}>
-                    Week of {format(weekStartDate, 'MMMM d, yyyy')}
+                    Phase of {format(phaseStartDate, 'MMMM d, yyyy')}
                   </h3>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                    {format(weekStartDate, 'MMM d')} - {format(weekEndDate, 'MMM d, yyyy')}
+                    {format(phaseStartDate, 'MMM d')} - {format(phaseEndDate, 'MMM d, yyyy')}
                   </div>
                   <p style={{ whiteSpace: 'pre-wrap', color: 'var(--text-primary)', margin: 0, lineHeight: 1.6 }}>
                     {goal.text}

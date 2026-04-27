@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import type { WeeklyGoal } from '../db/database';
 import { v4 as uuidv4 } from 'uuid';
-import { startOfWeek, format } from 'date-fns';
+import { format } from 'date-fns';
+import { getBiWeeklyPeriod } from '../utils/dateUtils';
 import { supabase } from '../lib/supabase';
 
 interface WeeklyGoalState {
@@ -16,7 +17,8 @@ export const useWeeklyGoalStore = create<WeeklyGoalState>((set, get) => ({
   currentGoal: null,
   allGoals: [],
   loadGoal: async (date) => {
-    const weekStart = format(startOfWeek(date, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+    const { periodStart } = getBiWeeklyPeriod(date);
+    const weekStart = format(periodStart, 'yyyy-MM-dd');
     const { data: existingList, error } = await supabase.from('weekly_goals').select('*').eq('week_start', weekStart);
     
     if (error) {
@@ -27,7 +29,8 @@ export const useWeeklyGoalStore = create<WeeklyGoalState>((set, get) => ({
     set({ currentGoal: existingList?.[0] || null });
   },
   saveGoal: async (date, text) => {
-    const weekStart = format(startOfWeek(date, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+    const { periodStart } = getBiWeeklyPeriod(date);
+    const weekStart = format(periodStart, 'yyyy-MM-dd');
     const { currentGoal } = get();
 
     if (currentGoal && currentGoal.week_start === weekStart) {

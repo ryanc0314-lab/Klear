@@ -2,10 +2,11 @@ import { useEffect, useState, useMemo } from 'react';
 import { useHabitStore } from '../../store/habitStore';
 import { Plus, Check, Flame, Trash2, Undo, Circle, CheckCircle2, ChevronDown, ChevronUp, Archive, Calendar, Pencil, X } from 'lucide-react';
 import { ResponsiveLine } from '@nivo/line';
-import { format, subDays, startOfWeek, addDays, subWeeks, isToday } from 'date-fns';
+import { format, subDays, startOfWeek, addDays, subWeeks, isToday, differenceInDays } from 'date-fns';
 import { type Habit, type HabitLog } from '../../db/database';
 import { HabitTagEditor, type HabitTag } from './HabitTagEditor';
 import { WeeklyGoalsArea } from '../Shared/WeeklyGoalsArea';
+import { getBiWeeklyPeriod } from '../../utils/dateUtils';
 
 const HabitCard = ({ habit, logs, selectedDate, setSelectedDate, isArchived, availableTags }: { habit: Habit, logs: HabitLog[], selectedDate: string, setSelectedDate: (d: string) => void, isArchived: boolean, availableTags: HabitTag[] }) => {
   const { archiveHabit, restoreHabit, deleteHabit, logHabit, updateHabit } = useHabitStore();
@@ -83,13 +84,14 @@ const HabitCard = ({ habit, logs, selectedDate, setSelectedDate, isArchived, ava
     }];
   }, [logs, habit]);
 
-  const currentWeekStart = startOfWeek(new Date(selectedDate + 'T12:00:00'), { weekStartsOn: 1 });
+  const { periodStart: currentPeriodStart, periodEnd: currentPeriodEnd } = getBiWeeklyPeriod(new Date(selectedDate + 'T12:00:00'));
 
-  const renderWeekRow = (weekStart: Date) => {
-    const days = Array.from({ length: 7 }).map((_, i) => addDays(weekStart, i));
+  const renderPeriodRow = (periodStart: Date, periodEnd: Date) => {
+    const length = differenceInDays(periodEnd, periodStart) + 1;
+    const days = Array.from({ length }).map((_, i) => addDays(periodStart, i));
     
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem', textAlign: 'center' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${length}, 1fr)`, gap: '0.5rem', textAlign: 'center' }}>
         {days.map(day => {
           const dayStr = format(day, 'yyyy-MM-dd');
           const dayLog = logs.find(l => l.date === dayStr);
@@ -282,15 +284,15 @@ const HabitCard = ({ habit, logs, selectedDate, setSelectedDate, isArchived, ava
         </div>
       )}
 
-      {/* Current Week Tracker */}
+      {/* Current Phase Tracker */}
       {!isArchived && (
         <div style={{ marginTop: '1rem', backgroundColor: 'var(--bg-card-hover)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem', textAlign: 'center', marginBottom: '1rem' }}>
-            {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map(d => (
-              <div key={d} style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{d}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${differenceInDays(currentPeriodEnd, currentPeriodStart) + 1}, 1fr)`, gap: '0.5rem', textAlign: 'center', marginBottom: '1rem' }}>
+            {Array.from({ length: differenceInDays(currentPeriodEnd, currentPeriodStart) + 1 }).map((_, i) => addDays(currentPeriodStart, i)).map(d => (
+              <div key={d.toISOString()} style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{format(d, 'EEE').toUpperCase()}</div>
             ))}
           </div>
-          {renderWeekRow(currentWeekStart)}
+          {renderPeriodRow(currentPeriodStart, currentPeriodEnd)}
         </div>
       )}
 
@@ -302,19 +304,21 @@ const HabitCard = ({ habit, logs, selectedDate, setSelectedDate, isArchived, ava
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.875rem', padding: '0.5rem 0' }}
           >
             {showArchive ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            {showArchive ? 'Hide Archive' : 'View Previous Weeks'}
+            {showArchive ? 'Hide Archive' : 'View Previous Phases'}
           </button>
           
           {showArchive && (
             <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', animation: 'fadeIn 0.2s ease-out' }}>
-              {[1, 2, 3, 4].map(weeksAgo => {
-                const prevWeekStart = startOfWeek(subWeeks(new Date(selectedDate + 'T12:00:00'), weeksAgo), { weekStartsOn: 1 });
+              {[1, 2, 3, 4].map(phasesAgo => {
+                let d = new Date(currentPeriodStart);
+                for(let i=0; i<phasesAgo; i++) { d = subDays(d, 3); d = getBiWeeklyPeriod(d).periodStart; }
+                const { periodStart: prevPeriodStart, periodEnd: prevPeriodEnd } = getBiWeeklyPeriod(d);
                 return (
-                  <div key={weeksAgo} style={{ opacity: 0.8 }}>
+                  <div key={phasesAgo} style={{ opacity: 0.8 }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Week of {format(prevWeekStart, 'MMM dd, yyyy')}
+                      Phase {format(prevPeriodStart, 'MMM dd')} - {format(prevPeriodEnd, 'MMM dd')}
                     </div>
-                    {renderWeekRow(prevWeekStart)}
+                    {renderPeriodRow(prevPeriodStart, prevPeriodEnd)}
                   </div>
                 );
               })}
