@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useWeeklyGoalStore } from '../../store/weeklyGoalStore';
-import { Target, Save, Check } from 'lucide-react';
-import { format } from 'date-fns';
+import { Target, Save, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { format, addDays, subDays } from 'date-fns';
 import { getBiWeeklyPeriod } from '../../utils/dateUtils';
 
 export const WeeklyGoalsArea = ({ currentDate = new Date() }: { currentDate?: Date }) => {
@@ -11,14 +11,22 @@ export const WeeklyGoalsArea = ({ currentDate = new Date() }: { currentDate?: Da
   const [showSaved, setShowSaved] = useState(false);
   const timeoutRef = useRef<number | undefined>(undefined);
 
-  const { periodStart, periodEnd } = getBiWeeklyPeriod(currentDate);
+  const [viewDate, setViewDate] = useState<Date>(currentDate);
+  useEffect(() => {
+    setViewDate(currentDate);
+  }, [currentDate]);
+
+  const { periodStart, periodEnd } = getBiWeeklyPeriod(viewDate);
+
+  const handlePrevPhase = () => setViewDate(subDays(periodStart, 1));
+  const handleNextPhase = () => setViewDate(addDays(periodEnd, 1));
 
   const weekStartStr = format(periodStart, 'yyyy-MM-dd');
   const seededWeekRef = useRef<string | null>(null);
 
   // Use a stable date string for dependencies to prevent infinite render loops
   // if currentDate is a new Date() object on every render
-  const dateStr = format(currentDate, 'yyyy-MM-dd');
+  const dateStr = format(viewDate, 'yyyy-MM-dd');
 
   useEffect(() => {
     loadGoal(new Date(dateStr + 'T12:00:00'));
@@ -36,7 +44,7 @@ export const WeeklyGoalsArea = ({ currentDate = new Date() }: { currentDate?: Da
   const handleSave = async (manual = false) => {
     if (text !== currentGoal?.text) {
       setIsSaving(true);
-      await saveGoal(currentDate, text);
+      await saveGoal(viewDate, text);
       setIsSaving(false);
       
       if (manual) {
@@ -57,8 +65,16 @@ export const WeeklyGoalsArea = ({ currentDate = new Date() }: { currentDate?: Da
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-primary)' }}>
           <Target size={24} color="var(--accent-primary)" />
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Phase Intentions</h2>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <button onClick={handlePrevPhase} title="Previous Phase" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: '0.1rem' }}>
+                <ChevronLeft size={18} />
+              </button>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Phase Intentions</h2>
+              <button onClick={handleNextPhase} title="Next Phase" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: '0.1rem' }}>
+                <ChevronRight size={18} />
+              </button>
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.1rem', textAlign: 'center' }}>
               {format(periodStart, 'MMM d')} - {format(periodEnd, 'MMM d, yyyy')}
             </div>
           </div>
