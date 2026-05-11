@@ -142,3 +142,9 @@ export interface Note {
   tags?: string[];
 }
 
+export interface DailyIntention {
+  id: string;
+  date: string; // YYYY-MM-DD
+  text: string;
+}
+

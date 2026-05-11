@@ -1,11 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
-import { useWeeklyGoalStore } from '../../store/weeklyGoalStore';
+import { useDailyIntentionStore } from '../../store/dailyIntentionStore';
 import { Target, Save, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, addDays, subDays } from 'date-fns';
-import { getBiWeeklyPeriod } from '../../utils/dateUtils';
 
-export const WeeklyGoalsArea = ({ currentDate }: { currentDate?: Date }) => {
-  const { currentGoal, loadGoal, saveGoal } = useWeeklyGoalStore();
+export const DailyIntentionsArea = ({ currentDate }: { currentDate?: Date }) => {
+  const { currentIntention, loadIntention, saveIntention } = useDailyIntentionStore();
   const [text, setText] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
@@ -19,28 +18,22 @@ export const WeeklyGoalsArea = ({ currentDate }: { currentDate?: Date }) => {
     }
   }, [currentDate?.getTime()]);
 
-  const { periodStart, periodEnd } = getBiWeeklyPeriod(viewDate);
+  const handlePrevDay = () => setViewDate(subDays(viewDate, 1));
+  const handleNextDay = () => setViewDate(addDays(viewDate, 1));
 
-  const handlePrevPhase = () => setViewDate(subDays(periodStart, 1));
-  const handleNextPhase = () => setViewDate(addDays(periodEnd, 1));
-
-  const weekStartStr = format(periodStart, 'yyyy-MM-dd');
-
-  // Use a stable date string for dependencies to prevent infinite render loops
-  // if currentDate is a new Date() object on every render
   const dateStr = format(viewDate, 'yyyy-MM-dd');
 
   useEffect(() => {
-    loadGoal(new Date(dateStr + 'T12:00:00'));
-  }, [dateStr, loadGoal]);
+    loadIntention(new Date(dateStr + 'T12:00:00'));
+  }, [dateStr, loadIntention]);
 
   useEffect(() => {
-    if (currentGoal && currentGoal.week_start === weekStartStr) {
-      setText(currentGoal.text || '');
+    if (currentIntention && currentIntention.date === dateStr) {
+      setText(currentIntention.text || '');
     } else {
       setText('');
     }
-  }, [currentGoal, weekStartStr]);
+  }, [currentIntention, dateStr]);
 
   const isSavingRef = useRef(false);
 
@@ -51,13 +44,13 @@ export const WeeklyGoalsArea = ({ currentDate }: { currentDate?: Date }) => {
       timeoutRef.current = window.setTimeout(() => setShowSaved(false), 2000);
     }
 
-    if (text === currentGoal?.text || isSavingRef.current) return;
+    if (text === currentIntention?.text || isSavingRef.current) return;
     
     isSavingRef.current = true;
     setIsSaving(true);
     
     try {
-      await saveGoal(viewDate, text);
+      await saveIntention(viewDate, text);
     } finally {
       setIsSaving(false);
       isSavingRef.current = false;
@@ -69,22 +62,22 @@ export const WeeklyGoalsArea = ({ currentDate }: { currentDate?: Date }) => {
   };
 
   return (
-    <div className="animated-card" style={{ padding: '1.5rem', marginBottom: '2rem', borderLeft: '4px solid var(--accent-primary)' }}>
+    <div className="animated-card" style={{ padding: '1.5rem', marginBottom: '2rem', borderLeft: '4px solid var(--accent-secondary)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-primary)' }}>
-          <Target size={24} color="var(--accent-primary)" />
+          <Target size={24} color="var(--accent-secondary)" />
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <button onClick={handlePrevPhase} title="Previous Phase" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: '0.1rem' }}>
+              <button onClick={handlePrevDay} title="Previous Day" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: '0.1rem' }}>
                 <ChevronLeft size={18} />
               </button>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Phase Intentions</h2>
-              <button onClick={handleNextPhase} title="Next Phase" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: '0.1rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Daily Intention</h2>
+              <button onClick={handleNextDay} title="Next Day" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: '0.1rem' }}>
                 <ChevronRight size={18} />
               </button>
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.1rem', textAlign: 'center' }}>
-              {format(periodStart, 'MMM d')} - {format(periodEnd, 'MMM d, yyyy')}
+              {format(viewDate, 'EEEE, MMM d, yyyy')}
             </div>
           </div>
         </div>
@@ -107,8 +100,8 @@ export const WeeklyGoalsArea = ({ currentDate }: { currentDate?: Date }) => {
         value={text}
         onChange={(e) => setText(e.target.value)}
         onBlur={handleBlur}
-        placeholder="Write out your goals, intentions, or focuses for this phase here..."
-        rows={5}
+        placeholder="What is your main intention for today?"
+        rows={3}
         style={{
           width: '100%',
           padding: '1rem',

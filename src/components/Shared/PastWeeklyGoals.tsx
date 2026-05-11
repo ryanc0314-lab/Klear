@@ -17,7 +17,12 @@ export const PastWeeklyGoals = () => {
   // Filter out the current phase if needed
   const { periodStart: currentPeriodStart } = getBiWeeklyPeriod(new Date());
   const currentPhaseStartStr = format(currentPeriodStart, 'yyyy-MM-dd');
-  const pastGoals = allGoals.filter(goal => goal.week_start !== currentPhaseStartStr && goal.text.trim().length > 0);
+  const pastGoals = allGoals.filter(goal => 
+    goal && 
+    goal.week_start && 
+    goal.week_start !== currentPhaseStartStr && 
+    String(goal.text || '').trim().length > 0
+  );
 
   return (
     <div style={{ marginBottom: '2rem' }}>
@@ -53,7 +58,11 @@ export const PastWeeklyGoals = () => {
             </div>
           ) : (
             pastGoals.map(goal => {
+              if (!goal.week_start) return null;
+              
               const phaseStartDate = parseISO(goal.week_start);
+              if (isNaN(phaseStartDate.getTime())) return null; // Prevent crash on invalid date
+              
               const { periodEnd: phaseEndDate } = getBiWeeklyPeriod(phaseStartDate);
               
               return (

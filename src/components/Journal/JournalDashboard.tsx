@@ -4,6 +4,7 @@ import { FileText, Save, Tag, Trash2, Moon, Calendar as CalIcon, Pencil, Check, 
 import { format, isThisWeek, isThisMonth, isThisYear } from 'date-fns';
 import { WeeklyGoalsArea } from '../Shared/WeeklyGoalsArea';
 import { PastWeeklyGoals } from '../Shared/PastWeeklyGoals';
+import { DailyIntentionsArea } from './DailyIntentionsArea';
 
 export const JournalDashboard = () => {
   const { entries, loadEntries, addEntry, updateEntry, deleteEntry } = useJournalStore();
@@ -131,6 +132,7 @@ export const JournalDashboard = () => {
         <p style={{ color: 'var(--text-secondary)' }}>Log your thoughts, mood, and daily reflections.</p>
       </div>
 
+      <DailyIntentionsArea />
       <WeeklyGoalsArea />
       <PastWeeklyGoals />
 
