@@ -333,32 +333,32 @@ export const WorkoutDashboard = () => {
                         <div key={set.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem', backgroundColor: 'var(--bg-app)', borderRadius: 'var(--radius-md)', flexDirection: 'column', gap: '0.25rem' }}>
                           {editingSetId === set.id ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                              <input type="text" placeholder="Exercise Name" value={editSetName} onChange={e => setEditSetName(e.target.value)} style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} />
+                              <input type="text" placeholder="Exercise Name" value={editSetName} onChange={e => setEditSetName(e.target.value)} style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} />
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', backgroundColor: 'rgba(0,0,0,0.2)', padding: '0.5rem', borderRadius: 'var(--radius-sm)' }}>
                                 {editSetDetails.map((setInfo, idx) => (
-                                   <div key={idx} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                   <div key={idx} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                                      <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', minWidth: '40px' }}>Set {idx + 1}</span>
                                      <input type="number" placeholder="Reps" value={setInfo.reps} onChange={e => {
                                        const newL = [...editSetDetails];
                                        newL[idx].reps = e.target.value ? Number(e.target.value) : '';
                                        setEditSetDetails(newL);
-                                     }} style={{ flex: 1, minWidth: 0, padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} title="Reps" />
+                                     }} style={{ flex: 1, minWidth: '60px', padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} title="Reps" />
                                      <input type="number" placeholder="Lbs" value={setInfo.weight} onChange={e => {
                                        const newL = [...editSetDetails];
                                        newL[idx].weight = e.target.value ? Number(e.target.value) : '';
                                        setEditSetDetails(newL);
-                                     }} style={{ flex: 1, minWidth: 0, padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} title="Lbs" />
-                                     <div style={{ display: 'flex', flex: 1.5, minWidth: 0 }}>
+                                     }} style={{ flex: 1, minWidth: '60px', padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} title="Lbs" />
+                                     <div style={{ display: 'flex', flex: 1.5, minWidth: '110px' }}>
                                        <input type="number" placeholder="Dur" value={setInfo.duration} onChange={e => {
                                          const newL = [...editSetDetails];
                                          newL[idx].duration = e.target.value ? Number(e.target.value) : '';
                                          setEditSetDetails(newL);
-                                       }} style={{ flex: 1, minWidth: 0, padding: '0.5rem', borderRadius: 'var(--radius-sm) 0 0 var(--radius-sm)', border: '1px solid var(--border-color)', borderRight: 'none', background: 'var(--bg-app)', color: 'white' }} title="Duration" />
+                                       }} style={{ flex: 1, minWidth: 0, padding: '0.5rem', borderRadius: 'var(--radius-sm) 0 0 var(--radius-sm)', border: '1px solid var(--border-color)', borderRight: 'none', background: 'var(--bg-app)', color: 'var(--text-primary)' }} title="Duration" />
                                        <select value={setInfo.duration_unit || 'min'} onChange={e => {
                                          const newL = [...editSetDetails];
                                          newL[idx] = { ...newL[idx], duration_unit: e.target.value as 'min'|'sec' };
                                          setEditSetDetails(newL);
-                                       }} style={{ width: '50px', padding: '0.5rem 0.25rem', borderRadius: '0 var(--radius-sm) var(--radius-sm) 0', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'white', cursor: 'pointer' }}>
+                                       }} style={{ width: '50px', padding: '0.5rem 0.25rem', borderRadius: '0 var(--radius-sm) var(--radius-sm) 0', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-primary)', cursor: 'pointer' }}>
                                          <option value="min">m</option><option value="sec">s</option>
                                        </select>
                                      </div>
@@ -377,8 +377,8 @@ export const WorkoutDashboard = () => {
                                 }} style={{ alignSelf: 'center', padding: '0.25rem 0.5rem', fontSize: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px dashed var(--border-color)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', marginTop: '0.25rem' }}>+ Add Set</button>
                               </div>
                               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <input type="number" placeholder="Rest (sec)" value={editSetRest} onChange={e => setEditSetRest(e.target.value ? Number(e.target.value) : '')} style={{ flex: 1, padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} title="Rest Time (sec)" />
-                                <input type="text" placeholder="Notes" value={editSetNotes} onChange={e => setEditSetNotes(e.target.value)} style={{ flex: 2, padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} />
+                                <input type="number" placeholder="Rest (sec)" value={editSetRest} onChange={e => setEditSetRest(e.target.value ? Number(e.target.value) : '')} style={{ flex: 1, padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} title="Rest Time (sec)" />
+                                <input type="text" placeholder="Notes" value={editSetNotes} onChange={e => setEditSetNotes(e.target.value)} style={{ flex: 2, padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} />
                               </div>
                               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.5rem' }}>
                                 <button onClick={cancelSetEdit} style={{ padding: '0.5rem 1rem', background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>Cancel</button>
@@ -453,35 +453,35 @@ export const WorkoutDashboard = () => {
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1rem', background: 'var(--bg-card-hover)', borderRadius: 'var(--radius-md)' }}>
                       <h4 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Log Exercise</h4>
-                      <input type="text" placeholder="Exercise Name" value={exName} onChange={e => setExName(e.target.value)} style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} />
+                      <input type="text" placeholder="Exercise Name" value={exName} onChange={e => setExName(e.target.value)} style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} />
                       
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', backgroundColor: 'rgba(0,0,0,0.1)', padding: '0.5rem', borderRadius: 'var(--radius-sm)' }}>
                         {exSetsList.map((setInfo, idx) => (
-                           <div key={idx} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                           <div key={idx} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                              <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', minWidth: '40px' }}>Set {idx + 1}</span>
                              <input type="number" placeholder="Reps" value={setInfo.reps} onChange={e => {
                                const newL = [...exSetsList];
                                newL[idx].reps = e.target.value ? Number(e.target.value) : '';
                                setExSetsList(newL);
-                             }} style={{ flex: 1, minWidth: 0, padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} title="Reps" />
+                             }} style={{ flex: 1, minWidth: '60px', padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} title="Reps" />
                              
                              <input type="number" placeholder="Lbs" value={setInfo.weight} onChange={e => {
                                const newL = [...exSetsList];
                                newL[idx].weight = e.target.value ? Number(e.target.value) : '';
                                setExSetsList(newL);
-                             }} style={{ flex: 1, minWidth: 0, padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} title="Lbs" />
+                             }} style={{ flex: 1, minWidth: '60px', padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} title="Lbs" />
                              
-                             <div style={{ display: 'flex', flex: 1.5, minWidth: 0 }}>
+                             <div style={{ display: 'flex', flex: 1.5, minWidth: '110px' }}>
                                <input type="number" placeholder="Dur" value={setInfo.duration} onChange={e => {
                                  const newL = [...exSetsList];
                                  newL[idx].duration = e.target.value ? Number(e.target.value) : '';
                                  setExSetsList(newL);
-                               }} style={{ flex: 1, minWidth: 0, padding: '0.5rem', borderRadius: 'var(--radius-sm) 0 0 var(--radius-sm)', border: '1px solid var(--border-color)', borderRight: 'none', background: 'var(--bg-app)', color: 'white' }} title="Duration" />
+                               }} style={{ flex: 1, minWidth: 0, padding: '0.5rem', borderRadius: 'var(--radius-sm) 0 0 var(--radius-sm)', border: '1px solid var(--border-color)', borderRight: 'none', background: 'var(--bg-app)', color: 'var(--text-primary)' }} title="Duration" />
                                <select value={setInfo.duration_unit || 'min'} onChange={e => {
                                  const newL = [...exSetsList];
                                  newL[idx] = { ...newL[idx], duration_unit: e.target.value as 'min'|'sec' };
                                  setExSetsList(newL);
-                               }} style={{ width: '50px', padding: '0.5rem 0.25rem', borderRadius: '0 var(--radius-sm) var(--radius-sm) 0', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'white', cursor: 'pointer' }}>
+                               }} style={{ width: '50px', padding: '0.5rem 0.25rem', borderRadius: '0 var(--radius-sm) var(--radius-sm) 0', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-primary)', cursor: 'pointer' }}>
                                  <option value="min">m</option><option value="sec">s</option>
                                </select>
                              </div>
@@ -502,8 +502,8 @@ export const WorkoutDashboard = () => {
                       </div>
 
                       <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <input type="number" placeholder="Rest (sec)" value={exRest} onChange={e => setExRest(e.target.value ? Number(e.target.value) : '')} style={{ flex: 1, padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} title="Rest Time (sec)" />
-                        <input type="text" placeholder="Notes (e.g. felt easy)" value={exNotes} onChange={e => setExNotes(e.target.value)} style={{ flex: 2, padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} />
+                        <input type="number" placeholder="Rest (sec)" value={exRest} onChange={e => setExRest(e.target.value ? Number(e.target.value) : '')} style={{ flex: 1, padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} title="Rest Time (sec)" />
+                        <input type="text" placeholder="Notes (e.g. felt easy)" value={exNotes} onChange={e => setExNotes(e.target.value)} style={{ flex: 2, padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} />
                       </div>
 
                       <button onClick={() => handleAddExercise(workout.id)} className="btn btn-primary" style={{ padding: '0.75rem', justifyContent: 'center' }}>
@@ -882,7 +882,7 @@ const PlannerCard = ({ dayOfWeek, dayName, plan, onSave, onLogRoutine }: any) =>
 
       {isEditing ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <input type="text" placeholder="Category (e.g. Push Day, Rest)" value={category} onChange={e => setCategory(e.target.value)} onBlur={() => updatePlan(category, exercises)} style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white', width: '100%' }} />
+          <input type="text" placeholder="Category (e.g. Push Day, Rest)" value={category} onChange={e => setCategory(e.target.value)} onBlur={() => updatePlan(category, exercises)} style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)', width: '100%' }} />
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {exercises.map((ex, i) => (
@@ -940,35 +940,35 @@ const PlannerCard = ({ dayOfWeek, dayName, plan, onSave, onLogRoutine }: any) =>
               )}
             </div>
             
-            <input type="text" placeholder="Exercise Name" value={exName} onChange={e => setExName(e.target.value)} style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} />
+            <input type="text" placeholder="Exercise Name" value={exName} onChange={e => setExName(e.target.value)} style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} />
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', backgroundColor: 'rgba(0,0,0,0.1)', padding: '0.5rem', borderRadius: 'var(--radius-sm)' }}>
               {exSetsList.map((setInfo, idx) => (
-                 <div key={idx} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                 <div key={idx} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                    <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', minWidth: '40px' }}>Set {idx + 1}</span>
                    <input type="number" placeholder="Reps" value={setInfo.reps} onChange={e => {
                      const newL = [...exSetsList];
                      newL[idx].reps = e.target.value ? Number(e.target.value) : '';
                      setExSetsList(newL);
-                   }} style={{ flex: 1, minWidth: 0, padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} title="Reps" />
+                   }} style={{ flex: 1, minWidth: '60px', padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} title="Reps" />
                    
                    <input type="number" placeholder="Lbs" value={setInfo.weight} onChange={e => {
                      const newL = [...exSetsList];
                      newL[idx].weight = e.target.value ? Number(e.target.value) : '';
                      setExSetsList(newL);
-                   }} style={{ flex: 1, minWidth: 0, padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} title="Lbs" />
+                   }} style={{ flex: 1, minWidth: '60px', padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} title="Lbs" />
                    
-                   <div style={{ display: 'flex', flex: 1.5, minWidth: 0 }}>
+                   <div style={{ display: 'flex', flex: 1.5, minWidth: '110px' }}>
                      <input type="number" placeholder="Dur" value={setInfo.duration} onChange={e => {
                        const newL = [...exSetsList];
                        newL[idx].duration = e.target.value ? Number(e.target.value) : '';
                        setExSetsList(newL);
-                     }} style={{ flex: 1, minWidth: 0, padding: '0.5rem', borderRadius: 'var(--radius-sm) 0 0 var(--radius-sm)', border: '1px solid var(--border-color)', borderRight: 'none', background: 'var(--bg-app)', color: 'white' }} title="Duration" />
+                     }} style={{ flex: 1, minWidth: 0, padding: '0.5rem', borderRadius: 'var(--radius-sm) 0 0 var(--radius-sm)', border: '1px solid var(--border-color)', borderRight: 'none', background: 'var(--bg-app)', color: 'var(--text-primary)' }} title="Duration" />
                      <select value={setInfo.duration_unit || 'min'} onChange={e => {
                        const newL = [...exSetsList];
                        newL[idx] = { ...newL[idx], duration_unit: e.target.value as 'min'|'sec' };
                        setExSetsList(newL);
-                     }} style={{ width: '50px', padding: '0.5rem 0.25rem', borderRadius: '0 var(--radius-sm) var(--radius-sm) 0', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'white', cursor: 'pointer' }}>
+                     }} style={{ width: '50px', padding: '0.5rem 0.25rem', borderRadius: '0 var(--radius-sm) var(--radius-sm) 0', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-primary)', cursor: 'pointer' }}>
                        <option value="min">m</option><option value="sec">s</option>
                      </select>
                    </div>
@@ -989,12 +989,12 @@ const PlannerCard = ({ dayOfWeek, dayName, plan, onSave, onLogRoutine }: any) =>
             </div>
             
             <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <input type="number" placeholder="Rest between sets (sec)" value={exRest} onChange={e => setExRest(e.target.value ? Number(e.target.value) : '')} style={{ flex: 1, padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} title="Rest Time (sec)" />
+              <input type="number" placeholder="Rest between sets (sec)" value={exRest} onChange={e => setExRest(e.target.value ? Number(e.target.value) : '')} style={{ flex: 1, padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} title="Rest Time (sec)" />
             </div>
             
-            <input type="text" placeholder="Notes (e.g. slow eccentric)" value={exNotes} onChange={e => setExNotes(e.target.value)} style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'white' }} />
+            <input type="text" placeholder="Notes (e.g. slow eccentric)" value={exNotes} onChange={e => setExNotes(e.target.value)} style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-app)', color: 'var(--text-primary)' }} />
             
-            <button onClick={saveOrAddEx} style={{ background: 'var(--accent-primary)', color: 'white', border: 'none', borderRadius: 'var(--radius-sm)', padding: '0.5rem', cursor: 'pointer', marginTop: '0.25rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.25rem' }}>
+            <button onClick={saveOrAddEx} style={{ background: 'var(--accent-primary)', color: 'var(--text-primary)', border: 'none', borderRadius: 'var(--radius-sm)', padding: '0.5rem', cursor: 'pointer', marginTop: '0.25rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.25rem' }}>
               {editingExIndex !== null ? <Check size={16} /> : <Plus size={16} />} 
               {editingExIndex !== null ? 'Save Exercise' : 'Add to Plan'}
             </button>

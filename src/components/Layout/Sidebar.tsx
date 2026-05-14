@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, CheckSquare, Activity, Dumbbell, Book, Sun, Moon, Folder, BarChart2, ChevronLeft, ChevronRight, StickyNote } from 'lucide-react';
+import { Home, CheckSquare, Activity, Dumbbell, Book, Sun, Moon, Folder, BarChart2, ChevronLeft, ChevronRight, StickyNote, Bell } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 const navItems = [
   { name: 'Dashboard', path: '/', icon: Home },
@@ -30,6 +31,58 @@ export const Sidebar = ({ isCollapsed, toggleCollapse }: SidebarProps) => {
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  const subscribeToNotifications = async () => {
+    try {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        alert('Push notifications are not supported by your browser.');
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        alert('Notification permission denied.');
+        return;
+      }
+      const registration = await navigator.serviceWorker.ready;
+      const applicationServerKey = urlB64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY);
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey,
+      });
+
+      const { error } = await supabase.from('push_subscriptions').insert({
+        endpoint: subscription.endpoint,
+        p256dh: arrayBufferToBase64(subscription.getKey('p256dh')),
+        auth: arrayBufferToBase64(subscription.getKey('auth'))
+      });
+      
+      if (error) {
+        console.error('Error saving subscription', error);
+        alert('Failed to save subscription.');
+      } else {
+        alert('Successfully subscribed to notifications!');
+      }
+    } catch (err) {
+      console.error('Error subscribing to notifications', err);
+    }
+  };
+
+  const urlB64ToUint8Array = (base64String: string) => {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) { outputArray[i] = rawData.charCodeAt(i); }
+    return outputArray;
+  };
+  
+  const arrayBufferToBase64 = (buffer: ArrayBuffer | null) => {
+    if (!buffer) return '';
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < bytes.byteLength; i++) { binary += String.fromCharCode(bytes[i]); }
+    return window.btoa(binary);
   };
 
   return (
@@ -95,32 +148,81 @@ export const Sidebar = ({ isCollapsed, toggleCollapse }: SidebarProps) => {
         })}
         
         {/* Mobile Theme Toggle */}
+        <div style={{ display: 'flex', width: '100%', gap: '0.25rem' }}>
+          <button 
+            onClick={toggleTheme}
+            title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            className="nav-link hide-on-desktop"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.25rem',
+              padding: '0.5rem',
+              border: 'none',
+              backgroundColor: 'transparent',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              fontSize: '0.65rem',
+              flex: 1
+            }}
+          >
+            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            <span>Theme</span>
+          </button>
+
+          <button 
+            onClick={subscribeToNotifications}
+            title="Enable Notifications"
+            className="nav-link hide-on-desktop"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.25rem',
+              padding: '0.5rem',
+              border: 'none',
+              backgroundColor: 'transparent',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              fontSize: '0.65rem',
+              flex: 1
+            }}
+          >
+            <Bell size={20} />
+            <span>Notify</span>
+          </button>
+        </div>
+      </nav>
+
+      <div className="mobile-sidebar-header hide-on-mobile" style={{ marginTop: 'auto', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: isCollapsed ? 'center' : 'stretch' }}>
         <button 
-          onClick={toggleTheme}
-          title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-          className="nav-link hide-on-desktop"
+          onClick={subscribeToNotifications}
+          title="Enable Notifications"
           style={{
             display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.25rem',
-            padding: '0.5rem',
+            justifyContent: isCollapsed ? 'center' : 'flex-start',
+            gap: isCollapsed ? '0' : '0.75rem',
+            width: isCollapsed ? '48px' : '100%',
+            padding: '0.75rem',
             border: 'none',
             backgroundColor: 'transparent',
             color: 'var(--text-secondary)',
             cursor: 'pointer',
-            fontSize: '0.65rem',
-            width: '100%',
-            minWidth: '60px'
+            borderRadius: 'var(--radius-md)',
+            fontWeight: 500,
+            transition: 'background-color 0.2s ease'
           }}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)'}
+          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
         >
-          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-          <span>Theme</span>
+          <Bell size={20} />
+          {!isCollapsed && <span>Notifications</span>}
         </button>
-      </nav>
 
-      <div className="mobile-sidebar-header hide-on-mobile" style={{ marginTop: 'auto', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem', display: 'flex', justifyContent: isCollapsed ? 'center' : 'stretch' }}>
         <button 
           onClick={toggleTheme}
           title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
